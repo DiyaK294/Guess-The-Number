@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Number</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Guess the Number</h1>
+            <p>Can you guess the secret number?</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="game-area" class="game-area">
+            <p>I'm thinking of a number between <strong>1</strong> and <strong>100</strong>.</p>
+            <p>Can you guess it?</p>
+
+            <input type="number" id="guess-input" placeholder="Enter your guess" />
+            <button id="submit-button">Submit</button>
+
+            <div id="feedback">
+                <p id="feedback-message">Make your guess!</p>
+            </div>
+
+            <div id="stats">
+                <p>Attempts: <span id="attempts">0</span></p>
+                <p>Time Remaining: <span id="timer">60</span> seconds</p>
+            </div>
+
+            <button id="restart-button">Restart</button>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Guess the Number. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        let secretNumber = Math.floor(Math.random() * 100) + 1;
+        let attempts = 0;
+        let timeRemaining = 60;
+        let timerInterval;
+
+        const guessInput = document.getElementById("guess-input");
+        const submitButton = document.getElementById("submit-button");
+        const feedbackMessage = document.getElementById("feedback-message");
+        const attemptsDisplay = document.getElementById("attempts");
+        const timerDisplay = document.getElementById("timer");
+        const restartButton = document.getElementById("restart-button");
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                timerDisplay.textContent = timeRemaining;
+
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    feedbackMessage.textContent = `Time's up! The correct number was ${secretNumber}.`;
+                    guessInput.disabled = true;
+                    submitButton.disabled = true;
+                }
+            }, 1000);
+        }
+
+        submitButton.addEventListener("click", () => {
+            const playerGuess = parseInt(guessInput.value);
+
+            if (isNaN(playerGuess) || playerGuess < 1 || playerGuess > 100) {
+                feedbackMessage.textContent = "Please enter a valid number between 1 and 100.";
+                return;
+            }
+
+            attempts++;
+            attemptsDisplay.textContent = attempts;
+
+            if (playerGuess === secretNumber) {
+                feedbackMessage.textContent = `Congratulations! You guessed the number ${secretNumber} in ${attempts} attempts!`;
+                clearInterval(timerInterval);
+                guessInput.disabled = true;
+                submitButton.disabled = true;
+            } else if (playerGuess < secretNumber) {
+                feedbackMessage.textContent = "Too low! Try again.";
+            } else {
+                feedbackMessage.textContent = "Too high! Try again.";
+            }
+        });
+
+        restartButton.addEventListener("click", () => {
+            secretNumber = Math.floor(Math.random() * 100) + 1;
+            attempts = 0;
+            timeRemaining = 60;
+            attemptsDisplay.textContent = attempts;
+            timerDisplay.textContent = timeRemaining;
+            feedbackMessage.textContent = "Make your guess!";
+            guessInput.disabled = false;
+            submitButton.disabled = false;
+            guessInput.value = "";
+            startTimer();
+        });
+
+        startTimer();
+    </script>
+</body>
+</html>
